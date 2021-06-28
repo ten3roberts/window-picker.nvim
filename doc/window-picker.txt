@@ -1,0 +1,101 @@
+*window-picker*                  For Neovim version 0.5           Last Change: 2021 Jun 28 
+                    _           _                          _      _             
+                                                   
+========================================================================================
+INTRODUCTION                     *window-picker*  *window-picker-introduction*
+A Neovim plugin for quickly navigating between windows.
+
+Vim's window movement commands work fine when navigating to adjacent windows.
+However, they quickly become tedious when navigating further and often causes
+you to end up at the wrong split when there are two adjacent ones.
+
+window-picker.nvim allows you to quickly jump to any window by annotating each
+window with a letter.
+
+It also allows you to swap the contents of two windows without disturbing your
+layout, something which is almost impossible in normal vim.
+
+If a number is given instead of a key, the winnr is used, similar to `<number><C-w><C-w>`
+
+If `swap_shift == true` the windows will be swapped if the shift key is held
+when swapping windows.
+
+USAGE                                                    *window-picker-usage* 
+
+Configuration is done by passing a table to the setup function. All keys are
+optional and will be set to their default value if left out. If you are only
+using the default values, `setup` is not necessary.
+>
+require'window-picker'.setup{
+  -- Default keys to annotate, keys will be used in order.
+  -- Use the most accessible keys from the home row and then top row.
+  -- keys = 'alskdjfhgwoeiruty',
+  -- Swap windows by holding shift + letter
+  swap_shift = true,
+  -- Windows containing filetype to exclude
+  exclude = { qf = true, NvimTree = true, aerial = true }
+}
+-- Example keymaps
+
+-- Move to window, or swap by using shift + letter
+vim.api.nvim_set_keymap('n', '<leader>ww', 'require"window-picker".pick()')
+
+-- Swap with any window
+vim.api.nvim_set_keymap('n', '<leader>ws', 'require"window-picker".swap()')
+
+<
+
+LUA API                                                *window-picker-lua-api*
+
+`window-picker.setup({config})                           *window-picker.setup*
+  Setup the plugin with a custom config table.
+
+  Does not need to be called if using default options.
+
+Default options:                                 *window-picker-configuration* 
+>
+  require'window-picker'.setup {
+    -- Default keys to annotate, keys will be used in order. The default uses the
+    -- most accessible keys from the home row and then top row.
+    keys = 'alskdjfhgwoeiruty',
+    -- Swap windows by holding shift + letter
+    swap_shift = true,
+    -- Windows containing filetype to exclude
+    exclude = { qf = true, NvimTree = true, aerial = true }
+  }
+<
+
+`window-picker.pick([winid])`                             *window-picker.pick*
+  Pick a window jump to it.
+
+  If `winid` is given, the user will not be prompted.
+
+  If shift is held while selecting and |window-picker.swap_shift| is true, the windows will be swapped.
+
+`window-picker.swap(stay, [winid]) `                      *window-picker.swap*
+  Pick a window and swap it with the current one.
+
+  If `winid` is given, the user will not be prompted.
+
+
+
+COMMANDS                                              *window-picker-commands*
+
+`WindowPicker`                                                 *:WindowPicker*
+  Pick and jump to a window by annotating each window with a character.
+  If a number is typed, it is interpreted as the winnr.
+
+  If shift is held when selecting a window, and |window-picker.swap_shift| == true`, then the
+  selected and current window will be swapped.
+
+`:WindowSwap`                                                   *:WindowSwap*
+  Pick and swap the current window with the selected window.
+
+`:WindowSwapStay`                                            *:WindowSwapStay*
+  Same as `:WindowSwap`, except it doesn't follow the buffer to the new
+  swapped window.
+
+COLORS                                                 *window-picker-colors*
+window-picker defines two colors: `WindowPicker` and `WindowPickerSwap` which are used to highlight windows when picking and swapping, respectively.
+
+vim:tw=78:ts=8:noet:ft=help:norl:
