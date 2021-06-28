@@ -17,8 +17,11 @@ layout, something which is almost impossible in normal vim.
 
 If a number is given instead of a key, the winnr is used, similar to `<number><C-w><C-w>`
 
-If `swap_shift == true` the windows will be swapped if the shift key is held
+If |window-picker.swap_shift| is true the windows will be swapped if the shift key is held
 when swapping windows.
+
+If there are only two windows, the user wont be prompted as there are no other
+windows to select.
 
 USAGE                                                    *window-picker-usage* 
 
@@ -43,8 +46,6 @@ vim.api.nvim_set_keymap('n', '<leader>ww', 'require"window-picker".pick()')
 -- Swap with any window
 vim.api.nvim_set_keymap('n', '<leader>ws', 'require"window-picker".swap()')
 
-<
-
 LUA API                                                *window-picker-lua-api*
 
 `window-picker.setup({config})                           *window-picker.setup*
@@ -53,17 +54,17 @@ LUA API                                                *window-picker-lua-api*
   Does not need to be called if using default options.
 
 Default options:                                 *window-picker-configuration* 
->
-  require'window-picker'.setup {
-    -- Default keys to annotate, keys will be used in order. The default uses the
-    -- most accessible keys from the home row and then top row.
-    keys = 'alskdjfhgwoeiruty',
-    -- Swap windows by holding shift + letter
-    swap_shift = true,
-    -- Windows containing filetype to exclude
-    exclude = { qf = true, NvimTree = true, aerial = true }
-  }
-<
+
+`keys` = 'alskdjfhgwoeiruty', 	      	 		  *window-picker-keys*
+  Default keys to annotate, keys will be used in order. The default uses the
+  most accessible keys from the home row and then top row.
+
+`swap_shift` = true,                                *window-picker.swap_shift*       
+  Swap windows by holding shift + letter
+
+`exclude`                                              *window-picker-exclude*
+    = { qf = true, NvimTree = true, aerial = true }
+  Windows containing filetype to exclude
 
 `window-picker.pick([winid])`                             *window-picker.pick*
   Pick a window jump to it.

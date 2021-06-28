@@ -19,6 +19,9 @@ If a number is given instead of a key, the winnr is used, similar to `<number><C
 If `swap_shift == true` the windows will be swapped if the shift key is held
 when swapping windows.
 
+If there are only two windows, the user wont be prompted as there are no other
+windows to select.
+
 ## Usage
 
 Configuration is done by passing a table to the setup function. All keys are
