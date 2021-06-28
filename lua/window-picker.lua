@@ -35,12 +35,12 @@ local function choose(hl)
   local tabpage = api.nvim_get_current_tabpage()
   local win_ids = api.nvim_tabpage_list_wins(tabpage)
   local exclude = M.config.exclude
-  local winid = fn.win_getid()
+  local cur_winid = fn.win_getid()
 
   local candidates = vim.tbl_filter(function (id)
     local bufnr = api.nvim_win_get_buf(id)
 
-    if id == winid then
+    if id == cur_winid then
       return false
     end
     if exclude[api.nvim_buf_get_option(bufnr, 'filetype')] == true then
