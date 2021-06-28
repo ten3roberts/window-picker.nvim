@@ -51,7 +51,7 @@ local function choose(hl)
   end, win_ids)
 
   -- If there are no candidate windows, return nil
-  if #candidates == 0 then return -1 end
+  if #candidates == 0 then return nil end
   -- There is only one candidate
   if #candidates == 1 then return candidates[1] end
 
