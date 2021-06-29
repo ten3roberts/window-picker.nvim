@@ -1,6 +1,6 @@
+local api = vim.api
 local fn = vim.fn
 local o = vim.o
-local api = vim.api
 
 local shift_numbers = {
   [ '!' ] = 1,
@@ -18,7 +18,7 @@ local shift_numbers = {
 local defaults = {
   keys = 'alskdjfhgwoeiruty',
   swap_shift = true,
-  exclude = { qf = true,  vimTree = true, aerial = true },
+  exclude = { qf = true, NvimTree = true, aerial = true },
   flash_duration = 300,
 }
 
