@@ -1,14 +1,14 @@
-window_picker                  For Neovim version 0.5           Last Change: 2021 Jun 28 
+window-picker                  For Neovim version 0.5           Last Change: 2021 Jun 28 
                                                    
 ========================================================================================
-INTRODUCTION                     *window_picker*  *window_picker-introduction*
+INTRODUCTION                     *window-picker*  *window_picker-introduction*
 A Neovim plugin for quickly navigating between windows.
 
 Vim's window movement commands work fine when navigating to adjacent windows.
 However, they quickly become tedious when navigating further and often causes
 you to end up at the wrong split when there are two adjacent ones.
 
-window_picker.nvim allows you to quickly jump to any window by annotating each
+window-picker.nvim allows you to quickly jump to any window by annotating each
 window with a letter.
 
 It also allows you to swap the contents of two windows without disturbing your
@@ -16,19 +16,19 @@ layout, something which is almost impossible in normal vim.
 
 If a number is given instead of a key, the winnr is used, similar to `<number><C-w><C-w>`
 
-If |window_picker.swap_shift| is true the windows will be swapped if the shift key is held
+If |window-picker.swap_shift| is true the windows will be swapped if the shift key is held
 when swapping windows.
 
 If there are only two windows, the user wont be prompted as there are no other
 windows to select.
 
-USAGE                                                    *window_picker-usage* 
+USAGE                                                    *window-picker-usage* 
 
 Configuration is done by passing a table to the setup function. All keys are
 optional and will be set to their default value if left out. If you are only
 using the default values, `setup` is not necessary.
 >
-require'window_picker'.setup{
+require'window-picker'.setup{
   -- Default keys to annotate, keys will be used in order.
   -- Use the most accessible keys from the home row and then top row.
   -- keys = 'alskdjfhgwoeiruty',
@@ -40,53 +40,57 @@ require'window_picker'.setup{
 -- Example keymaps
 
 -- Move to window, or swap by using shift + letter
-vim.api.nvim_set_keymap('n', '<leader>ww', 'require"window_picker".pick()')
+vim.api.nvim_set_keymap('n', '<leader>ww', 'require"window-picker".pick()')
 
 -- Swap with any window
-vim.api.nvim_set_keymap('n', '<leader>ws', 'require"window_picker".swap()')
+vim.api.nvim_set_keymap('n', '<leader>ws', 'require"window-picker".swap()')
 
-LUA API                                                *window_picker-lua-api*
+LUA API                                                *window-picker-lua-api*
 
-`window_picker.setup({config})                           *window_picker.setup*
+`window-picker.setup({config})                           *window_picker.setup*
   Setup the plugin with a custom config table.
 
   Does not need to be called if using default options.
 
-Default options:                                 *window_picker-configuration* 
+Default options:                                 *window-picker-configuration* 
 
-  `keys` = 'alskdjfhgwoeiruty', 	      	          *window_picker-keys*
+  `keys` = 'alskdjfhgwoeiruty', 	      	          *window-picker.keys*
     Default keys to annotate, keys will be used in order. The default uses the
     most accessible keys from the home row and then top row.
 
-  `swap_shift` = true,                                *window_picker.swap_shift*       
+  `swap_shift` = true,                                *window-picker.swap_shift*       
     Swap windows by holding shift + letter
 
-  `exclude`                                              *window_picker-exclude*
+  `exclude`                                              *window-picker.exclude*
      = { qf = true, NvimTree = true, aerial = true }
     Windows containing filetype to exclude
 
-`window_picker.pick([winid])`                             *window_picker.pick*
+  `flash_duration` = 300,                       *window-picker.flash_duration*
+    Flash the cursor line of the newly focused window for 300ms.
+    Set to 0 or false to disable
+
+`window-picker.pick([winid])`                             *window_picker.pick*
   Pick a window jump to it.
 
   If `winid` is given, the user will not be prompted.
 
-  If shift is held while selecting and |window_picker.swap_shift| is true, the
+  If shift is held while selecting and |window-picker.swap_shift| is true, the
   windows will be swapped.
 
-`window_picker.swap(stay, [winid]) `                      *window_picker.swap*
+`window-picker.swap(stay, [winid]) `                      *window_picker.swap*
   Pick a window and swap it with the current one.
 
   If `winid` is given, the user will not be prompted.
 
 
 
-COMMANDS                                              *window_picker-commands*
+COMMANDS                                              *window-picker-commands*
 
 `WindowPicker`                                                 *:WindowPicker*
   Pick and jump to a window by annotating each window with a character.
   If a number is typed, it is interpreted as the winnr.
 
-  If shift is held when selecting a window, and |window_picker.swap_shift| ==
+  If shift is held when selecting a window, and |window-picker.swap_shift| ==
   true`, then the selected and current window will be swapped.
 
 `:WindowSwap`                                                   *:WindowSwap*
@@ -96,8 +100,8 @@ COMMANDS                                              *window_picker-commands*
   Same as `:WindowSwap`, except it doesn't follow the buffer to the new
   swapped window.
 
-COLORS                                                 *window_picker-colors*
-window_picker defines two colors: `WindowPicker` and `WindowPickerSwap` which
+COLORS                                                 *window-picker-colors*
+window-picker defines two colors: `WindowPicker` and `WindowPickerSwap` which
 are used to highlight windows when picking and swapping, respectively.
 
 vim:tw=78:ts=8:noet:ft=help:norl:

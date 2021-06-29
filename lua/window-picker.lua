@@ -18,7 +18,8 @@ local shift_numbers = {
 local defaults = {
   keys = 'alskdjfhgwoeiruty',
   swap_shift = true,
-  exclude = { qf = true,  vimTree = true, aerial = true }
+  exclude = { qf = true,  vimTree = true, aerial = true },
+  flash_duration = 300,
 }
 
 local M = {
@@ -27,6 +28,26 @@ local M = {
 
 function M.setup(config)
   config = vim.tbl_extend('force', defaults, config or {})
+end
+
+-- Flashes the the cursor line of winid
+local function flash_highlight(winid, duration, hl_group)
+  if duration == false or duration == 0 then
+    return
+  end
+
+  if duration == true or duration == 1 then
+    duration = 300
+  end
+
+  local lnum = api.nvim_win_get_cursor(winid)[1]
+  local bufnr = api.nvim_win_get_buf(winid)
+
+  local ns = vim.api.nvim_buf_add_highlight(bufnr, 0, hl_group, lnum - 1, 0, -1)
+  local remove_highlight = function()
+    vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+  end
+  vim.defer_fn(remove_highlight, duration)
 end
 
 -- Annotates and returns the picker window.
@@ -133,6 +154,7 @@ function M.pick(winid)
 
   api.nvim_set_current_win(winid)
 
+  flash_highlight(winid, M.config.flash_duration, 'WindowPicker')
 end
 
 -- Swaps current window with `winid`.
@@ -158,6 +180,8 @@ function M.swap(stay, winid)
   if not stay then
     api.nvim_set_current_win(winid)
   end
+
+  flash_highlight(winid, M.config.flash_duration, 'WindowPickerSwap')
 end
 
 vim.cmd 'hi WindowPicker     guifg=#ededed guibg=#5e81ac gui=bold'

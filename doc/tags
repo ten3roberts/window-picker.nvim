@@ -1,0 +1,16 @@
+:WindowPicker	window-picker.txt	/*:WindowPicker*
+:WindowSwap	window-picker.txt	/*:WindowSwap*
+:WindowSwapStay	window-picker.txt	/*:WindowSwapStay*
+window_picker	window-picker.txt	/*window_picker*
+window_picker-colors	window-picker.txt	/*window_picker-colors*
+window_picker-commands	window-picker.txt	/*window_picker-commands*
+window_picker-configuration	window-picker.txt	/*window_picker-configuration*
+window_picker-exclude	window-picker.txt	/*window_picker-exclude*
+window_picker-introduction	window-picker.txt	/*window_picker-introduction*
+window_picker-keys	window-picker.txt	/*window_picker-keys*
+window_picker-lua-api	window-picker.txt	/*window_picker-lua-api*
+window_picker-usage	window-picker.txt	/*window_picker-usage*
+window_picker.pick	window-picker.txt	/*window_picker.pick*
+window_picker.setup	window-picker.txt	/*window_picker.setup*
+window_picker.swap	window-picker.txt	/*window_picker.swap*
+window_picker.swap_shift	window-picker.txt	/*window_picker.swap_shift*

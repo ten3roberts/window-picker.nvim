@@ -35,7 +35,10 @@ require'window-picker'.setup{
   -- Swap windows by holding shift + letter
   swap_shift = true,
   -- Windows containing filetype to exclude
-  exclude = { qf = true, NvimTree = true, aerial = true }
+  exclude = { qf = true, NvimTree = true, aerial = true },
+  -- Flash the cursor line of the newly focused window for 300ms.
+  -- Set to 0 or false to disable.
+  flash_duration = 300,
 }
 
 -- Example keymaps
