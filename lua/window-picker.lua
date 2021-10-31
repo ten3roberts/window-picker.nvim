@@ -67,6 +67,9 @@ local function choose(hl)
     if exclude[api.nvim_buf_get_option(bufnr, 'filetype')] == true then
       return false
     end
+    if api.nvim_win_get_config(id).relative ~= '' then
+      return false
+    end
 
     return true
   end, win_ids)
