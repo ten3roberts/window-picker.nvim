@@ -30,6 +30,10 @@ function M.setup(config)
   config = vim.tbl_extend('force', defaults, config or {})
 end
 
+local function clear_prompt()
+  vim.api.nvim_command('normal :esc<CR>')
+end
+
 -- Flashes the the cursor line of winid
 local function flash_highlight(winid, duration, hl_group)
   if duration == false or duration == 0 then
@@ -109,7 +113,7 @@ local function choose(hl)
   -- Get next char
   local input = fn.getchar()
 
-  print('')
+  clear_prompt()
 
   -- Restore window statuslines
   for _, winid in ipairs(candidates) do
