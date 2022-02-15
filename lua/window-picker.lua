@@ -27,7 +27,7 @@ local M = {
 }
 
 function M.setup(config)
-  config = vim.tbl_extend('force', defaults, config or {})
+  M.config = vim.tbl_extend('force', defaults, config or {})
 end
 
 local function clear_prompt()
