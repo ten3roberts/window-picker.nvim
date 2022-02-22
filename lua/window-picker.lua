@@ -191,7 +191,7 @@ function M.swap(stay, winid)
   flash_highlight(winid, M.config.flash_duration, 'WindowPickerSwap')
 end
 
-vim.cmd 'hi WindowPicker     guifg=#ededed guibg=#5e81ac gui=bold'
-vim.cmd 'hi WindowPickerSwap guifg=#ededed guibg=#d08770 gui=bold'
+vim.cmd 'hi default WindowPicker     guifg=#ededed guibg=#5e81ac gui=bold'
+vim.cmd 'hi default WindowPickerSwap guifg=#ededed guibg=#d08770 gui=bold'
 
 return M
