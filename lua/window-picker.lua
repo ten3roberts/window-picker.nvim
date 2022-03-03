@@ -127,7 +127,11 @@ local function choose(hl)
   o.laststatus = laststatus
 
 
-  local key = string.char(input)
+  local key = input
+
+  if type(input) == "string" then
+    key = string.char(input)
+  end
 
   -- User entered a number
   if input > 48 and input < 58 then
