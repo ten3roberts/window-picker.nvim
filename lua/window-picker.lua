@@ -129,7 +129,7 @@ local function choose(hl)
 
   local key = input
 
-  if type(input) == "string" then
+  if type(input) == "number" then
     key = string.char(input)
   end
 
