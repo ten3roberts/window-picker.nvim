@@ -134,11 +134,11 @@ local function choose(hl)
   end
 
   -- User entered a number
-  if input > 48 and input < 58 then
+  if type(input) == "number" and input > 48 and input < 58 then
     return fn.win_getid(input - 48), false
   elseif shift_numbers[key] then
     return fn.win_getid(shift_numbers[key]), true
-  else
+  elseif type(input) == "number" then
     return win_keys[key:upper()], bit.band(input, 100000) == 0
   end
 
