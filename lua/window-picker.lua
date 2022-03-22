@@ -118,8 +118,6 @@ local function select(opts, callback)
   o.laststatus = 2
   local nums = {}
 
-  print(vim.inspect(keys))
-
   -- Setup UI
   local ckeys = M.config.keys
   for i, winid in ipairs(candidates) do
@@ -166,7 +164,6 @@ local function select(opts, callback)
     mod = "shift"
   end
 
-  print(key)
   return callback(winid, mod)
 end
 
