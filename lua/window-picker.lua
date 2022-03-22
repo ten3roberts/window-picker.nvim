@@ -2,6 +2,20 @@ local api = vim.api
 local fn = vim.fn
 local o = vim.o
 
+
+local numbers = {
+  [ '1' ] = 1,
+  [ '2' ] = 2,
+  [ '3' ] = 3,
+  [ '4' ] = 4,
+  [ '5' ] = 5,
+  [ '6' ] = 6,
+  [ '7' ] = 7,
+  [ '8' ] = 8,
+  [ '9' ] = 9,
+  [ '0' ] = '$',
+}
+
 local shift_numbers = {
   [ '!' ] = 1,
   [ '@' ] = 2,
@@ -22,12 +36,19 @@ local defaults = {
   flash_duration = 300,
 }
 
+local keys = {}
+
 local M = {
   config = defaults
 }
 
 function M.setup(config)
   M.config = vim.tbl_extend('force', defaults, config or {})
+  local i = 1
+  for v in M.config.keys:gmatch(".") do
+    keys[v] = i
+    i = i + 1
+  end
 end
 
 local function clear_prompt()
@@ -88,8 +109,6 @@ local function select(opts, callback)
   -- There is only one candidate
   if #candidates == 1 then return callback(candidates[1], false) end
 
-  local keys = M.config.keys
-
   -- Old window statusline
   local old_statuslines = {}
   local win_keys = {}
@@ -97,10 +116,14 @@ local function select(opts, callback)
   -- Save old value and force statusline
   local laststatus = o.laststatus
   o.laststatus = 2
+  local nums = {}
+
+  print(vim.inspect(keys))
 
   -- Setup UI
+  local ckeys = M.config.keys
   for i, winid in ipairs(candidates) do
-    local key = keys:sub(i, i):upper()
+    local key = ckeys:sub(i, i):upper()
 
     local ok, old_statusline = pcall(api.nvim_win_get_option, winid, 'statusline')
 
@@ -108,18 +131,16 @@ local function select(opts, callback)
       old_statuslines[winid] = old_statusline
     end
 
-    win_keys[key] = winid
+    nums[i] = winid
 
     api.nvim_win_set_option(winid, 'statusline', string.format("%%#%s#%%=%s%%=", opts.hl or 'WindowPicker', key))
-
-    if i > #keys then break end
   end
 
   vim.cmd("redraw")
   print(opts.prompt or "Pick window: ")
 
   -- Get next char
-  local input = fn.getchar()
+  local input = fn.getcharstr()
 
   clear_prompt()
 
@@ -132,22 +153,21 @@ local function select(opts, callback)
   o.laststatus = laststatus
 
 
-  local key = input
+  local key = input:sub(#input)
 
-  if type(input) == "number" then
-    key = string.char(input)
+  local num = keys[key:lower()] or numbers[key] or shift_numbers[key]
+  local winid = nums[num]
+  local mod
+
+  local alt = "^\x80\xfc\x08"
+  if input:find(alt) then
+    mod = "alt"
+  elseif key:lower() ~= key then
+    mod = "shift"
   end
 
-  -- User entered a number
-  if type(input) == "number" and input > 48 and input < 58 then
-    return callback(fn.win_getid(input - 48), false)
-  elseif shift_numbers[key] then
-    return callback(fn.win_getid(shift_numbers[key]), true)
-  elseif type(input) == "number" then
-    return callback(win_keys[key:upper()], bit.band(input, 100000) == 0)
-  end
-
-  callback(nil)
+  print(key)
+  return callback(winid, mod)
 end
 
 local function swap_with(stay, winid)
@@ -172,12 +192,16 @@ local function zap_with(winid, force)
   api.nvim_win_close(winid, force)
 end
 
--- Jumps to `winid`.
+--- Jump to the selected window
+--- If shift is held, the window will be swapped
+--- If alt is held, the window will be zapped
 function M.pick()
-  select({ hl = 'WindowPicker', prompt = 'Pick window: '}, function(winid, upper)
+  select({ hl = 'WindowPicker', prompt = 'Pick window: '}, function(winid, mod)
     if not winid then return end
-    if upper and M.config.swap_shift then
+    if mod == "shift" and M.config.swap_shift then
       return swap_with(false, winid)
+    elseif mod == "alt" then
+      return zap_with(winid, false)
     else
       api.nvim_set_current_win(winid)
       flash_highlight(winid, M.config.flash_duration, 'WindowPicker')
