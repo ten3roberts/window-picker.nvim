@@ -1,6 +1,6 @@
 # window-picker.nvim
 
-A Neovim plugin for quickly navigating between windows.
+A Neovim plugin for quickly navigating between, swapping, and closing windows.
 
 ## Motivation
 
@@ -21,6 +21,8 @@ when swapping windows.
 
 If there are only two windows, the user wont be prompted as there are no other
 windows to select.
+
+
 
 ## Usage
 
@@ -44,12 +46,19 @@ require'window-picker'.setup{
 -- Example keymaps
 
 -- Move to window, or swap by using shift + letter
-vim.api.nvim_set_keymap('n', '<leader>ww', 'require"window-picker".pick()')
+vim.api.nvim_set_keymap('n', '<leader>ww', "WindowPick")
 
 -- Swap with any window
-vim.api.nvim_set_keymap('n', '<leader>ws', 'require"window-picker".swap()')
+vim.api.nvim_set_keymap('n', '<leader>ws', "WindowSwap")
+vim.api.nvim_set_keymap('n', '<leader>wq', "WindowZap")
 ```
 
+## Custom commands
+
+`window-picker.select(opts, callback(winid, upper))` is exported and allows easy prompting of
+windows, similar to `ui.select`
+
 ## Colors
-window-picker uses the highlight groups `WindowPicker` and `WindowPickerSwap`.
+window-picker uses the highlight groups `WindowPicker`, `WindowPickerSwap`
+and `WindowPickerZap`.
 To customize the colors, simple define these groups yourself with `hi!`
