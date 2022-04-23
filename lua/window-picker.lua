@@ -4,29 +4,29 @@ local o = vim.o
 
 
 local numbers = {
-  [ '1' ] = 1,
-  [ '2' ] = 2,
-  [ '3' ] = 3,
-  [ '4' ] = 4,
-  [ '5' ] = 5,
-  [ '6' ] = 6,
-  [ '7' ] = 7,
-  [ '8' ] = 8,
-  [ '9' ] = 9,
-  [ '0' ] = '$',
+  ['1'] = 1,
+  ['2'] = 2,
+  ['3'] = 3,
+  ['4'] = 4,
+  ['5'] = 5,
+  ['6'] = 6,
+  ['7'] = 7,
+  ['8'] = 8,
+  ['9'] = 9,
+  ['0'] = '$',
 }
 
 local shift_numbers = {
-  [ '!' ] = 1,
-  [ '@' ] = 2,
-  [ '#' ] = 3,
-  [ '$' ] = 4,
-  [ '%' ] = 5,
-  [ '^' ] = 6,
-  [ '&' ] = 7,
-  [ '*' ] = 8,
-  [ '(' ] = 9,
-  [ ')' ] = '$',
+  ['!'] = 1,
+  ['@'] = 2,
+  ['#'] = 3,
+  ['$'] = 4,
+  ['%'] = 5,
+  ['^'] = 6,
+  ['&'] = 7,
+  ['*'] = 8,
+  ['('] = 9,
+  [')'] = '$',
 }
 
 local defaults = {
@@ -88,12 +88,15 @@ local function select(opts, callback)
   local exclude = M.config.exclude
   local cur_winid = fn.win_getid()
 
-  local candidates = vim.tbl_filter(function (id)
+  local index = 0
+  local candidates = vim.tbl_filter(function(val)
+    local id = val[2]
     local bufnr = api.nvim_win_get_buf(id)
 
     if id == cur_winid and not opts.include_cur then
       return false
     end
+
     if exclude[api.nvim_buf_get_option(bufnr, 'filetype')] == true then
       return false
     end
@@ -102,16 +105,15 @@ local function select(opts, callback)
     end
 
     return true
-  end, win_ids)
+  end, vim.tbl_map(function(winid) index = index + 1; return { index, winid } end, win_ids))
 
   -- If there are no candidate windows, return nil
   if #candidates == 0 then return callback() end
   -- There is only one candidate
-  if #candidates == 1 then return callback(candidates[1], false) end
+  if #candidates == 1 then return callback(candidates[1][2], false) end
 
   -- Old window statusline
   local old_statuslines = {}
-  local win_keys = {}
 
   -- Save old value and force statusline
   local laststatus = o.laststatus
@@ -120,7 +122,10 @@ local function select(opts, callback)
 
   -- Setup UI
   local ckeys = M.config.keys
-  for i, winid in ipairs(candidates) do
+  for _, v in ipairs(candidates) do
+    local winid = v[2]
+    local i = v[1]
+
     local key = ckeys:sub(i, i):upper()
 
     local ok, old_statusline = pcall(api.nvim_win_get_option, winid, 'statusline')
@@ -143,13 +148,13 @@ local function select(opts, callback)
   clear_prompt()
 
   -- Restore window statuslines
-  for _, winid in ipairs(candidates) do
+  for _, v in ipairs(candidates) do
+    local winid = v[2]
     api.nvim_win_set_option(winid, 'statusline', old_statuslines[winid])
   end
 
   -- Restore laststatus
   o.laststatus = laststatus
-
 
   local key = input:sub(#input)
 
@@ -193,7 +198,7 @@ end
 --- If shift is held, the window will be swapped
 --- If alt is held, the window will be zapped
 function M.pick()
-  select({ hl = 'WindowPicker', prompt = 'Pick window: '}, function(winid, mod)
+  select({ hl = 'WindowPicker', prompt = 'Pick window: ' }, function(winid, mod)
     if not winid then return end
     if mod == "shift" and M.config.swap_shift then
       return swap_with(false, winid)
@@ -209,7 +214,7 @@ end
 --- Swaps current window with selected
 --- @param stay boolean Stay in the window, do not follow the buffer
 function M.swap(stay)
-  select({ hl = 'WindowPickerSwap', prompt = 'Swap window: '}, function(w) swap_with(stay, w) end)
+  select({ hl = 'WindowPickerSwap', prompt = 'Swap window: ' }, function(w) swap_with(stay, w) end)
 end
 
 --- Closes the selected window
@@ -217,7 +222,7 @@ end
 --- @param force boolean Force close last window
 function M.zap(force)
   force = force or false
-  select({ hl = 'WindowPickerZap', prompt = 'Zap window: ', include_cur = force}, function(winid)
+  select({ hl = 'WindowPickerZap', prompt = 'Zap window: ', include_cur = force }, function(winid)
     if not winid then return end
 
     zap_with(winid, force)
