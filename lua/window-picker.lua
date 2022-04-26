@@ -51,10 +51,6 @@ function M.setup(config)
   end
 end
 
-local function clear_prompt()
-  vim.api.nvim_command('normal :esc<CR>')
-end
-
 -- Flashes the the cursor line of winid
 local function flash_highlight(winid, duration, hl_group)
   if duration == false or duration == 0 then
@@ -88,14 +84,10 @@ local function select(opts, callback)
   local exclude = M.config.exclude
   local cur_winid = fn.win_getid()
 
-  local index = 0
-  local candidates = vim.tbl_filter(function(val)
-    local id = val[2]
+  local hits = 0
+  local last_valid = nil
+  local candidates = vim.tbl_filter(function(id)
     local bufnr = api.nvim_win_get_buf(id)
-
-    if id == cur_winid and not opts.include_cur then
-      return false
-    end
 
     if exclude[api.nvim_buf_get_option(bufnr, 'filetype')] == true then
       return false
@@ -104,13 +96,24 @@ local function select(opts, callback)
       return false
     end
 
+    if id ~= cur_winid or opts.include_cur then
+      last_valid = id
+      hits = hits + 1
+    end
+
     return true
-  end, vim.tbl_map(function(winid) index = index + 1; return { index, winid } end, win_ids))
+  end, win_ids);
+
+  if hits == 0 then
+    return callback(nil, nil)
+  end
+  if hits == 1 and last_valid then
+    return callback(last_valid, nil)
+  end
 
   -- If there are no candidate windows, return nil
   if #candidates == 0 then return callback() end
   -- There is only one candidate
-  if #candidates == 1 then return callback(candidates[1][2], false) end
 
   -- Old window statusline
   local old_statuslines = {}
@@ -122,34 +125,41 @@ local function select(opts, callback)
 
   -- Setup UI
   local ckeys = M.config.keys
+  local index = 0;
+  if hits == 1 and last_valid then
+    return callback(last_valid, nil)
+  end
+
   for _, v in ipairs(candidates) do
-    local winid = v[2]
-    local i = v[1]
+    local winid = v
 
-    local key = ckeys:sub(i, i):upper()
+    index = index + 1
+    if winid ~= cur_winid or opts.include_cur then
+      local i = index
+      hits = hits + 1
+      last_valid = winid;
+      local key = ckeys:sub(i, i):upper()
 
-    local ok, old_statusline = pcall(api.nvim_win_get_option, winid, 'statusline')
+      local ok, old_statusline = pcall(api.nvim_win_get_option, winid, 'statusline')
 
-    if ok == true then
-      old_statuslines[winid] = old_statusline
+      if ok == true then
+        old_statuslines[winid] = old_statusline
+      end
+
+      nums[i] = winid
+
+      api.nvim_win_set_option(winid, 'statusline', string.format("%%#%s#%%=%s%%=", opts.hl or 'WindowPicker', key))
     end
-
-    nums[i] = winid
-
-    api.nvim_win_set_option(winid, 'statusline', string.format("%%#%s#%%=%s%%=", opts.hl or 'WindowPicker', key))
   end
 
   vim.cmd("redraw")
-  print(opts.prompt or "Pick window: ")
 
   -- Get next char
   local input = fn.getcharstr()
 
-  clear_prompt()
-
   -- Restore window statuslines
   for _, v in ipairs(candidates) do
-    local winid = v[2]
+    local winid = v
     api.nvim_win_set_option(winid, 'statusline', old_statuslines[winid])
   end
 
