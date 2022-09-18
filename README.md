@@ -19,16 +19,21 @@ If a number is given instead of a key, the winnr is used, similar to `<number><C
 If `swap_shift == true` the windows will be swapped if the shift key is held
 when swapping windows.
 
-If there are only two windows, the user wont be prompted as there are no other
+If there are only two windows, the user won't be prompted as there are no other
 windows to select.
 
+The labels for each window are layed out in the middle row, left to right (using
+qwerty).
 
+As such, the screen position of windows follow the order of the keys upon which your
+fingers rest on.
 
 ## Usage
 
 Configuration is done by passing a table to the setup function. All keys are
 optional and will be set to their default value if left out. If you are only
 using the default values, `setup` is not necessary.
+
 ```lua
 require'window-picker'.setup{
   -- Default keys to annotate, keys will be used in order. The default uses the
@@ -59,6 +64,7 @@ vim.api.nvim_set_keymap('n', '<leader>wq', "WindowZap")
 windows, similar to `ui.select`
 
 ## Colors
+
 window-picker uses the highlight groups `WindowPicker`, `WindowPickerSwap`
 and `WindowPickerZap`.
 To customize the colors, simple define these groups yourself with `hi!`
