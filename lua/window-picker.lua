@@ -52,6 +52,9 @@ end
 
 -- Flashes the the cursor line of winid
 local function flash_highlight(winid, duration, hl_group)
+	if not api.nvim_win_is_valid(winid) then
+		return
+	end
 	if duration == false or duration == 0 then
 		return
 	end
@@ -65,8 +68,11 @@ local function flash_highlight(winid, duration, hl_group)
 
 	local ns = vim.api.nvim_buf_add_highlight(bufnr, 0, hl_group, lnum - 1, 0, -1)
 	local remove_highlight = function()
-		vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+		if api.nvim_buf_is_valid(bufnr) then
+			vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+		end
 	end
+
 	vim.defer_fn(remove_highlight, duration)
 end
 
@@ -167,7 +173,9 @@ local function select(opts, callback)
 	-- Restore window statuslines
 	for _, v in ipairs(candidates) do
 		local winid = v
-		api.nvim_win_set_option(winid, "statusline", old_statuslines[winid])
+		if api.nvim_win_is_valid(winid) then
+			api.nvim_win_set_option(winid, "statusline", old_statuslines[winid])
+		end
 	end
 
 	-- Restore laststatus
