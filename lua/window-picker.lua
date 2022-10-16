@@ -52,6 +52,9 @@ end
 
 -- Flashes the the cursor line of winid
 local function flash_highlight(winid, duration, hl_group)
+	if not api.nvim_win_is_valid(winid) then
+		return
+	end
 	if duration == false or duration == 0 then
 		return
 	end
@@ -65,18 +68,22 @@ local function flash_highlight(winid, duration, hl_group)
 
 	local ns = vim.api.nvim_buf_add_highlight(bufnr, 0, hl_group, lnum - 1, 0, -1)
 	local remove_highlight = function()
-		vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+		if api.nvim_buf_is_valid(bufnr) then
+			vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+		end
 	end
+
 	vim.defer_fn(remove_highlight, duration)
 end
 
---- Annotates and returns the picker window.
---- @param callback function
---- @param opts SelectOptions
---- @class SelectOptions
---- @field prompt string
---- @field hl string
---- @field include_cur boolean
+---@class SelectOptions
+---@field prompt string
+---@field hl string
+---@field include_cur boolean
+
+---@param callback function
+---@param opts SelectOptions
+---Annotates and returns the picker window.
 local function select(opts, callback)
 	local tabpage = api.nvim_get_current_tabpage()
 	local win_ids = api.nvim_tabpage_list_wins(tabpage)
@@ -128,7 +135,9 @@ local function select(opts, callback)
 	local ckeys = M.config.keys
 	local index = 0
 	if hits == 1 and last_valid then
-		return callback(last_valid, nil)
+		if api.nvim_win_is_valid(last_valid) then
+			return callback(last_valid, nil)
+		end
 	end
 
 	for _, v in ipairs(candidates) do
@@ -165,7 +174,9 @@ local function select(opts, callback)
 	-- Restore window statuslines
 	for _, v in ipairs(candidates) do
 		local winid = v
-		api.nvim_win_set_option(winid, "statusline", old_statuslines[winid])
+		if api.nvim_win_is_valid(winid) then
+			api.nvim_win_set_option(winid, "statusline", old_statuslines[winid])
+		end
 	end
 
 	-- Restore laststatus
@@ -184,7 +195,9 @@ local function select(opts, callback)
 		mod = "shift"
 	end
 
-	return callback(winid, mod)
+	if api.nvim_win_is_valid(last_valid) then
+		return callback(winid, mod)
+	end
 end
 
 local function swap_with(stay, winid)
