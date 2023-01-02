@@ -35,19 +35,12 @@ local defaults = {
 	flash_duration = 300,
 }
 
-local keys = {}
-
 local M = {
 	config = defaults,
 }
 
 function M.setup(config)
 	M.config = vim.tbl_extend("force", defaults, config or {})
-	local i = 1
-	for v in M.config.keys:gmatch(".") do
-		keys[v] = i
-		i = i + 1
-	end
 end
 
 -- Flashes the the cursor line of winid
@@ -81,7 +74,7 @@ end
 ---@field hl string
 ---@field include_cur boolean
 
----@param callback function
+---@param callback fun(winid: number|nil, mod: string|nil)
 ---@param opts SelectOptions
 ---Annotates and returns the picker window.
 local function select(opts, callback)
@@ -133,6 +126,7 @@ local function select(opts, callback)
 
 	-- Setup UI
 	local ckeys = M.config.keys
+	local key_nums = {}
 	local index = 0
 	if hits == 1 and last_valid then
 		if api.nvim_win_is_valid(last_valid) then
@@ -163,6 +157,7 @@ local function select(opts, callback)
 				"statusline",
 				string.format("%%#%s#%%=%s%%=", opts.hl or "WindowPicker", key)
 			)
+			key_nums[key:lower()] = i
 		end
 	end
 
@@ -184,7 +179,7 @@ local function select(opts, callback)
 
 	local key = input:sub(#input)
 
-	local num = keys[key:lower()] or numbers[key] or shift_numbers[key]
+	local num = key_nums[key:lower()] or numbers[key] or shift_numbers[key]
 	local winid = nums[num]
 	local mod
 
